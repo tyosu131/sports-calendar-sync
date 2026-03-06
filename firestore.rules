@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // users: 本人のみ読み書き
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // leagues, teams: 認証済みユーザーは読み取り可。書き込みは Admin SDK のみ。
+    match /leagues/{leagueId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    match /teams/{teamId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // matches: 認証済みユーザーは読み取り可。書き込みは Admin SDK のみ。
+    match /matches/{matchId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+  }
+}
